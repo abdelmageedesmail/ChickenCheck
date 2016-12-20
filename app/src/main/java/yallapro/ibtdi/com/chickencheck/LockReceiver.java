@@ -35,12 +35,12 @@ public class LockReceiver extends BroadcastReceiver {
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.logo);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        builder.setTicker("هنالك حدث جديد")
+        builder.setTicker("Notification")
                 .setLargeIcon(bitmap)
                 .setSmallIcon(R.mipmap.logo)
                 .setContentIntent(pendingIntent)
-                .setContentTitle("حدث جديد")
-                .setContentText("باق 24 ساعة علي حدث بيوم ")
+                .setContentTitle("Notification")
+                .setContentText("Warning Check Your Safety Rule ")
                 .setVibrate(new long[]{1000, 2000, 1000, 2000, 1000, 2000})
                 .setSound(defaultSoundUri)
                 .setAutoCancel(true);
