@@ -27,14 +27,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        progressbarOne=(ProgressBar) findViewById(R.id.progressBarFloat);
-        progressBarSec=(ProgressBar) findViewById(R.id.progressBarSecond);
-        precent=(TextView) findViewById(R.id.percent);
-        SharedPreferences sh=getSharedPreferences("PercentData", MODE_PRIVATE);
-        SharedPreferences.Editor editor=sh.edit();
-        editor.putString("percent",precent.getText().toString()).apply();
 
-
+        definedData();
         firstThread();
 
         secThread();
@@ -43,6 +37,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void definedData(){
+        progressbarOne=(ProgressBar) findViewById(R.id.progressBarFloat);
+        progressBarSec=(ProgressBar) findViewById(R.id.progressBarSecond);
+        precent=(TextView) findViewById(R.id.percent);
+        SharedPreferences sh=getSharedPreferences("PercentData", MODE_PRIVATE);
+        SharedPreferences.Editor editor=sh.edit();
+        editor.putString("percent",precent.getText().toString()).apply();
+    }
 
 
     public void firstThread(){
