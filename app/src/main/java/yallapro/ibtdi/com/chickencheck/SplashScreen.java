@@ -21,7 +21,7 @@ public class SplashScreen extends AppCompatActivity {
 
             public void run() {
 
-                startActivity(new Intent(SplashScreen.this,MainActivity.class));
+                startActivity(new Intent(SplashScreen.this,ChartActivity.class));
                 overridePendingTransition(R.anim.enter_from_right, R.anim.exit_out_left);
                 finish();
 

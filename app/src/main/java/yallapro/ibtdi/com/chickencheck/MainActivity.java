@@ -28,12 +28,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        definedData();
-        firstThread();
+       // definedData();
+        //firstThread();
 
-        secThread();
+        //secThread();
 
-//        startService(new Intent(MainActivity.this,GetUserRegisterServices.class));
+        //startService(new Intent(MainActivity.this,GetUserRegisterServices.class));
     }
 
 
