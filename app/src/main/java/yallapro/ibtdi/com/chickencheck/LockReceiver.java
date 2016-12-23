@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -35,10 +36,14 @@ import java.util.concurrent.TimeUnit;
 
 
 public class LockReceiver extends BroadcastReceiver {
-   ArrayList<Mydata> data = new ArrayList<Mydata>();
-  HashMap<String,MyWeather> weath = new HashMap<>();
-String link="http://api.thingspeak.com/channels/204531/feeds.json?api_key=94G47FDM6PCUFTU8";
+    ArrayList<Mydata> data = new ArrayList<Mydata>();
+    HashMap<String,MyWeather> weath = new HashMap<>();
+    String link="http://api.thingspeak.com/channels/204531/feeds.json?api_key=94G47FDM6PCUFTU8";
     Context context;
+    Runnable run;
+    SharedPreferences pref;
+    String tempr,humadity,created_at;
+
     @Override
     public void onReceive(final Context context, Intent intent) {
     //    mData(context);
@@ -52,7 +57,7 @@ String link="http://api.thingspeak.com/channels/204531/feeds.json?api_key=94G47F
             }
         },TimeUnit.SECONDS.toMillis(1), TimeUnit.MINUTES.toMillis(1));
 
-
+       // runThread();
     }
 
 
@@ -67,10 +72,6 @@ String link="http://api.thingspeak.com/channels/204531/feeds.json?api_key=94G47F
                 date = element.date;
                 hum = element.hum;
                  temp = element.temp;
-//                Log.d("id:",tid+"");
-  //              Log.d("date:",date);
-    //            Log.d("temp:",temp);
-      //         Log.d("hum:",hum);
 
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
                 try {
@@ -108,9 +109,19 @@ String link="http://api.thingspeak.com/channels/204531/feeds.json?api_key=94G47F
                     for (int i = 0; i <feedsArray.length() ; i++) {
                         JSONObject jsonObject = feedsArray.getJSONObject(i);
                         int entry_id = jsonObject.getInt("entry_id");
-                        String tempr = jsonObject.getString("field1");
-                        String humadity = jsonObject.getString("field2");
-                        String created_at = jsonObject.getString("created_at");
+                        tempr = jsonObject.getString("field1");
+                        humadity = jsonObject.getString("field2");
+                        created_at = jsonObject.getString("created_at");
+                        Timer timer = new Timer();
+                        timer.scheduleAtFixedRate(new TimerTask() {
+                            @Override
+                            public void run() {
+                                pref=context.getSharedPreferences("Data",Context.MODE_PRIVATE);
+                                SharedPreferences.Editor editor=pref.edit();
+                                editor.putString("tempreature",tempr).putString("humadity",humadity).putString("createAt",created_at).apply();
+                                Log.e("temp and humadity",tempr+"...."+humadity+"....."+created_at);
+                            }
+                        },TimeUnit.SECONDS.toMillis(1), TimeUnit.MINUTES.toMillis(1));
                     data.add(new Mydata(entry_id,tempr,humadity,created_at));
                     }
 
@@ -130,7 +141,18 @@ String link="http://api.thingspeak.com/channels/204531/feeds.json?api_key=94G47F
         return data;
     }
 
+    private void runThread(){
+        Handler handler = new Handler();
+        run=new Runnable() {
+            @Override
+            public void run() {
 
+            }
+        };
+
+        handler.postDelayed(run, 3000);
+
+    }
 
     private void mData(Context context) {
 

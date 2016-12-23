@@ -1,9 +1,12 @@
 package yallapro.ibtdi.com.chickencheck;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
@@ -20,6 +23,9 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 //import com.jjoe64.graphview.*;
 
@@ -28,7 +34,10 @@ import java.util.List;
 public class ChartActivity extends AppCompatActivity {
 
     private BarChart barChart;
-
+    Handler handler = new Handler();
+    Runnable run;
+    SharedPreferences pref;
+    String temp,humadity,createAt;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +107,24 @@ public class ChartActivity extends AppCompatActivity {
 
 */
 
+        recieveThread();
+    }
+
+    private void recieveThread(){
+
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                pref=getSharedPreferences("Data",MODE_PRIVATE);
+                temp=pref.getString("tempreature","null");
+                humadity=pref.getString("humadity","null");
+                createAt=pref.getString("createAt","null");
+
+                Log.e("Data",temp+"....."+humadity+"......."+createAt);
+            }
+        }, TimeUnit.SECONDS.toMillis(1), TimeUnit.MINUTES.toMillis(1));
 
     }
+
 }
