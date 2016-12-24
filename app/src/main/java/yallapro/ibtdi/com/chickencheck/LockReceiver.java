@@ -116,7 +116,7 @@ public class LockReceiver extends BroadcastReceiver {
                 //Log.e("condition="+data.get(data.size()-1).date+" "+data.get(data.size()-2).date," "+data.get(data.size()-1).date.equalsIgnoreCase(data.get(data.size()-2).date));
                 result=0;
                 if (avg>=47 || avg<=18 && (last_Id!=id || id==0)){
-                    mData(context);
+                    mData(context,avg);
 
 
                 }}
@@ -135,7 +135,7 @@ public class LockReceiver extends BroadcastReceiver {
 
 
 
-    private void mData(Context context) {
+    private void mData(Context context,float avg) {
 
         Intent newIntent = new Intent(context, ChartActivity.class);
         newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -153,7 +153,7 @@ public class LockReceiver extends BroadcastReceiver {
                 .setSmallIcon(R.mipmap.logo)
                 .setContentIntent(pendingIntent)
                 .setContentTitle("Notification")
-                .setContentText("Warning Check Your Safety Rule ")
+                .setContentText("Warning tempreture is  "+avg)
                 .setSound(defaultSoundUri)
                 .setAutoCancel(true);
         NotificationManager notificationManager =
