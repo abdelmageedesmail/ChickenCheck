@@ -39,10 +39,16 @@ public class LockReceiver extends BroadcastReceiver {
     ArrayList<Mydata> data = new ArrayList<Mydata>();
     HashMap<String,MyWeather> weath = new HashMap<>();
     String link="http://api.thingspeak.com/channels/204531/feeds.json?api_key=94G47FDM6PCUFTU8";
-    Context context;
+    //Context context;
     Runnable run;
     SharedPreferences pref;
     String tempr,humadity,created_at;
+    private int result=0;
+    private float tmp=0;
+    private int last_Id=0;
+    private int entry_id=0;
+    private String s;
+    private ArrayList<String> tails;
 
     @Override
     public void onReceive(final Context context, Intent intent) {
@@ -51,83 +57,69 @@ public class LockReceiver extends BroadcastReceiver {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-              ArrayList<Mydata> data1 = getData(context);
-                checkAndFilter(data1);
+             getData(context);
+              // checkAndFilter(data1,context);
 
             }
-        },TimeUnit.SECONDS.toMillis(1), TimeUnit.MINUTES.toMillis(1));
+        },TimeUnit.SECONDS.toMillis(20), TimeUnit.MINUTES.toMillis(30));
 
        // runThread();
     }
-
-
-
-    private void checkAndFilter(ArrayList<Mydata> data1) {
-        String date;
-        String hum;
-        String temp;
-        if (!data1.isEmpty()){
-            for (Mydata element:data1) {
-                int tid = element.tid;
-                date = element.date;
-                hum = element.hum;
-                 temp = element.temp;
-
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                try {
-
-
-                    String s = DateUtils.getRelativeTimeSpanString(sdf.parse(date).getTime(), System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
-
-                    if(s.matches("[54321]{1} hour. ago")){
-                            weath.put(s,new MyWeather(temp,hum));
-                    }
-                    else if (s.contains("minute")){
-                        weath.put(s,new MyWeather(temp,hum));
-
-                    }
-                    else {
-                        System.out.println(s);
-
-                    }
-
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
-    }
-
     private ArrayList<Mydata> getData(final Context context) {
+
         StringRequest request = new StringRequest(Request.Method.GET, link, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                int id=0;
                 try {
+
                     JSONObject obj = new JSONObject(response);
                     JSONArray feedsArray = obj.getJSONArray("feeds");
-                    for (int i = 0; i <feedsArray.length() ; i++) {
+                    if(last_Id>0){
+                    JSONObject jsonObject1 = feedsArray.getJSONObject(last_Id-1);
+                     id = jsonObject1.getInt("entry_id");
+                        Log.e("id",id+"");
+                    }
+                    if(last_Id!=id || id==0){
+                    for (int i = last_Id; i <feedsArray.length() ; i++) {
                         JSONObject jsonObject = feedsArray.getJSONObject(i);
-                        int entry_id = jsonObject.getInt("entry_id");
+                         entry_id = jsonObject.getInt("entry_id");
                         tempr = jsonObject.getString("field1");
                         humadity = jsonObject.getString("field2");
                         created_at = jsonObject.getString("created_at");
-                        Timer timer = new Timer();
-                        timer.scheduleAtFixedRate(new TimerTask() {
-                            @Override
-                            public void run() {
-                                pref=context.getSharedPreferences("Data",Context.MODE_PRIVATE);
-                                SharedPreferences.Editor editor=pref.edit();
-                                editor.putString("tempreature",tempr).putString("humadity",humadity).putString("createAt",created_at).apply();
-                                Log.e("temp and humadity",tempr+"...."+humadity+"....."+created_at);
-                            }
-                        },TimeUnit.SECONDS.toMillis(1), TimeUnit.MINUTES.toMillis(1));
-                    data.add(new Mydata(entry_id,tempr,humadity,created_at));
-                    }
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                         s = DateUtils.getRelativeTimeSpanString(sdf.parse(created_at).getTime(), System.currentTimeMillis(), DateUtils.SECOND_IN_MILLIS).toString();
+                        data.add(new Mydata(entry_id,tempr,humadity,s));
+                    }}
+                    last_Id=entry_id;
+                    Log.e("last_id:",last_Id+"");
+
 
                 } catch (JSONException e) {
                     e.printStackTrace();
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
+                for (Mydata element:data
+                     ) {
+                    if (!element.temp.isEmpty()){
+                         tmp = Float.parseFloat(element.temp);
+                        Log.e("tmp= ", ""+tmp);
+                        result+=tmp;
+                    }
+                }
+                if (data.size()>0){
+              float avg= result/data.size();
+                Log.e("res= ", ""+result);
+                Log.e("avg= ", ""+avg);
+
+                //Log.e("condition="+data.get(data.size()-1).date+" "+data.get(data.size()-2).date," "+data.get(data.size()-1).date.equalsIgnoreCase(data.get(data.size()-2).date));
+                result=0;
+                if (avg>=47 || avg<=18 && (last_Id!=id || id==0)){
+                    mData(context);
+
+
+                }}
 
             }
         }, new Response.ErrorListener() {
@@ -141,22 +133,11 @@ public class LockReceiver extends BroadcastReceiver {
         return data;
     }
 
-    private void runThread(){
-        Handler handler = new Handler();
-        run=new Runnable() {
-            @Override
-            public void run() {
 
-            }
-        };
-
-        handler.postDelayed(run, 3000);
-
-    }
 
     private void mData(Context context) {
 
-        Intent newIntent = new Intent(context, MainActivity.class);
+        Intent newIntent = new Intent(context, ChartActivity.class);
         newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, newIntent,

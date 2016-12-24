@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 
 public class GetUserRegisterServices extends Service {
-    SharedPreferences sh;
 
     @Override
     public void onCreate() {
@@ -27,16 +26,6 @@ public class GetUserRegisterServices extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-  /*  private BroadcastReceiver mScreenStateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            switch (intent.getAction()) {
-                case Intent.ACTION_SCREEN_ON:
-                    Toast.makeText(context, "Notification", Toast.LENGTH_SHORT).show();
-                    break;
-            }
-        }
-    };*/
 
 
 
@@ -45,14 +34,4 @@ public class GetUserRegisterServices extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
-/*
-    @Override
-    protected void onHandleIntent(Intent intent) {
-
-        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-        registerReceiver(mScreenStateReceiver, filter);
-
-        sendBroadcast(new Intent(GetUserRegisterServices.this, LockReceiver.class));
-}
- */
 }
