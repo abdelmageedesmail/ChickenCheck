@@ -122,15 +122,10 @@ public class ChartActivity extends AppCompatActivity {
             @Override
             public void run() {
                 getTempData("http://api.thingspeak.com/channels/204531/feeds.json?api_key=94G47FDM6PCUFTU8");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                      //  recivedData(tempData);
-                    }
-                });
+
 
             }
-        },TimeUnit.SECONDS.toMillis(30),TimeUnit.MINUTES.toMillis(1));
+        },TimeUnit.SECONDS.toMillis(10),TimeUnit.MINUTES.toMillis(1));
 
     }
 
@@ -155,7 +150,7 @@ public class ChartActivity extends AppCompatActivity {
                         boolean matches = s.matches("\\d+ (minute|hour|day|month). ago");
                         System.out.println(s);
                         System.out.println(matches+"");
-                        if(s.matches("\\d+ (minute|hour|day|month). ago")){
+                        if(s.matches("\\d+ (minute|hour|day|month). ago")|| s.equalsIgnoreCase("yesterday")){
 
                             final int finalI = i;
                             runOnUiThread(new Runnable() {

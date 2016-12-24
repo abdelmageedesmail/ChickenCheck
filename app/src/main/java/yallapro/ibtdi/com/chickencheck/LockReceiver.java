@@ -154,7 +154,6 @@ public class LockReceiver extends BroadcastReceiver {
                 .setContentIntent(pendingIntent)
                 .setContentTitle("Notification")
                 .setContentText("Warning Check Your Safety Rule ")
-                .setVibrate(new long[]{1000, 2000, 1000, 2000, 1000, 2000})
                 .setSound(defaultSoundUri)
                 .setAutoCancel(true);
         NotificationManager notificationManager =
