@@ -1,6 +1,8 @@
 package yallapro.ibtdi.com.chickencheck;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -17,6 +19,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 //import com.github.mikephil.charting.components.Description;
@@ -41,10 +44,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-
-//import com.jjoe64.graphview.*;
-
-//import lecho.lib.hellocharts.view.LineChartView;
 
 public class ChartActivity extends AppCompatActivity {
 
@@ -117,16 +116,34 @@ public class ChartActivity extends AppCompatActivity {
         barChart.notifyDataSetChanged();
         barChart.invalidate();
         barChart.setTouchEnabled(false);
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                getTempData("http://api.thingspeak.com/channels/204531/feeds.json?api_key=94G47FDM6PCUFTU8");
+        if (isOnline()){
+            Timer timer = new Timer();
+            timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    getTempData("http://api.thingspeak.com/channels/204531/feeds.json?api_key=94G47FDM6PCUFTU8");
 
 
-            }
-        },TimeUnit.SECONDS.toMillis(10),TimeUnit.MINUTES.toMillis(1));
+                }
+            },TimeUnit.SECONDS.toMillis(10),TimeUnit.MINUTES.toMillis(1));
+        }else {
+            AlertDialog.Builder dialog=new AlertDialog.Builder(ChartActivity.this);
+            dialog.setTitle("No Internet Connection")
+                    .setMessage("Error in Connection, please try again")
+                    .setPositiveButton("Try Again", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Timer timer = new Timer();
+                            timer.scheduleAtFixedRate(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    getTempData("http://api.thingspeak.com/channels/204531/feeds.json?api_key=94G47FDM6PCUFTU8");
 
+                                }
+                            },TimeUnit.SECONDS.toMillis(10),TimeUnit.MINUTES.toMillis(1));
+                        }
+                    }).show();
+        }
     }
 
 
@@ -174,8 +191,6 @@ public class ChartActivity extends AppCompatActivity {
 
                             System.out.println(s+"  "+"done");
 
-
-
                     }
                 }} catch (JSONException e) {
                     e.printStackTrace();
@@ -214,6 +229,22 @@ public class ChartActivity extends AppCompatActivity {
 
             }
         }, TimeUnit.SECONDS.toMillis(1), TimeUnit.MINUTES.toMillis(1));
+
+    }
+
+    protected boolean isOnline() {
+
+        InternetConnection detector = new InternetConnection(ChartActivity.this);
+
+        if (detector.isConnectingToInternet() == true) {
+
+            return true;
+
+        } else {
+
+            return false;
+        }
+
 
     }
 
